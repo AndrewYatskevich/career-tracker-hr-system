@@ -1,7 +1,8 @@
 name: hr-system workflow
 
 on:
-  workflow_dispatch:
+  repository_dispatch:
+    types: [deploy]
 
 jobs:
   build-and-push:
