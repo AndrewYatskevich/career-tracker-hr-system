@@ -16,12 +16,15 @@ jobs:
 
       - name: Deploy
         uses: appleboy/ssh-action@v1.0.0
+        env:
+          DOCKER_HUB_USERNAME: ${{ secrets.DOCKER_HUB_USERNAME }}
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
+          envs: DOCKER_HUB_USERNAME
           script: |
             sudo docker compose stop
             touch .env
             echo "${{ secrets.ENV_FILE }}" > .env
-            sudo docker-compose up -d --build
+            sudo docker compose up -d --build
