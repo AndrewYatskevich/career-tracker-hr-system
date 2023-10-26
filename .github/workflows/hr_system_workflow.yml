@@ -3,16 +3,25 @@ name: hr-system workflow
 on:
   repository_dispatch:
     types: [deploy]
+  workflow_dispatch:
 
 jobs:
-  build-and-push:
-    name: Build and push api image
+  deploy-to-remote-server:
+    name: Deploy project to remote server
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Write a multi-line message
-        run: |
-          echo This demo file shows a 
-          echo very basic and easy-to-understand workflow.
+      - name: Deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            sudo docker compose stop
+            touch .env
+            echo "${{ secrets.ENV_FILE }}" > .env
+            sudo docker-compose up -d --build

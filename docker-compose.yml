@@ -1,0 +1,47 @@
+version: "3.8"
+
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-db:/var/lib/postgresql/data/
+    env_file:
+      - ./.env
+
+  api:
+    image: ${DOCKER_HUB_USERNAME}/hr-system-api:latest
+    restart: always
+    volumes:
+      - static_value:/app/django_static/
+      - media_value:/app/media/
+    depends_on:
+      - postgres-db
+    env_file:
+      - ./.env
+
+  frontend:
+    image: ${DOCKER_HUB_USERNAME}/hr-system-frontend:latest
+    volumes:
+      - frontend_build:/app/dist/
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - frontend_build:/usr/share/nginx/html/
+      - static_value:/var/html/django_static/
+      - media_value:/var/html/media/
+    depends_on:
+      - frontend
+      - api
+
+
+volumes:
+  postgres-db:
+  static_value:
+  media_value:
+  frontend_build:
