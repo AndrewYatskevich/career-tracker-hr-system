@@ -25,6 +25,8 @@ jobs:
           envs: DOCKER_HUB_USERNAME
           script: |
             sudo docker compose stop
+            sudo docker compose pull
             touch .env
             echo "${{ secrets.ENV_FILE }}" > .env
             sudo docker compose up -d --build
+            sudo docker image prune -f
